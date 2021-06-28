@@ -1,0 +1,109 @@
+
+SendGrid Documentation / For Developers / Sending Email / Email API Quickstart for Python
+Email API Quickstart for Python
+In this quickstart, you'll learn how to send your first email using the Twilio SendGrid Mail Send API and Python.
+
+Prerequisites
+Be sure to perform the following prerequisites to complete this tutorial. You can skip ahead if you've already completed these tasks.
+
+Sign up for a SendGrid account.
+Enable Two-factor authentication.
+Create and store a SendGrid API Key with Mail Send > Full Access permissions.
+Complete Domain Authentication.
+Install Python.
+Skip the prerequisites
+
+Sign up for a SendGrid account
+When you sign up for a free SendGrid account, you'll be able to send 100 emails per day forever. For more account options, see our pricing page.
+
+Enable Two-factor authentication
+Twilio SendGrid requires customers to enable Two-factor authentication (2FA). You can enable 2FA with SMS or by using the Authy app. See the 2FA section of our authentication documentation for instructions.
+
+Create and store a SendGrid API key
+Unlike a username and password — credentials that allow access to your full account — an API key is authorized to perform a limited scope of actions. If your API key is compromised, you can also cycle it (delete and create another) without changing your other account credentials.
+
+Visit our API Key documentation for instructions on creating an API key and storing an API key in an environment variable. To complete this tutorial, you can create a Restricted Access API key with Mail Send > Full Access permissions only, which will allow you to send email and schedule emails to be sent later. You can edit the permissions assigned to an API key later to work with additional services.
+
+Once your API key is assigned to an environment variable — this quickstart uses SENDGRID_API_KEY — you can proceed to the next step.
+
+export SENDGRID_API_KEY=<Your API Key>
+Verify your Sender Identity
+To ensure our customers maintain the best possible sender reputations and to uphold legitimate sending behavior, we require customers to verify their Sender Identities by completing Domain Authentication. A Sender Identity represents your 'From' email address—the address your recipients see as the sender of your emails.
+
+To get started quickly, you may be able to skip Domain Authentication and begin by completing Single Sender Verification. Single Sender Verification is recommended for testing only. Some email providers have DMARC policies that restrict email from being delivered using their domains. For the best experience, please complete Domain Authentication. Domain Authentication is also required to upgrade from a free account. To better understand why Domain Authentication is necessary, see our "Spoofing" and "Everything about DMARC" articles.
+
+Python
+Before installing Python, you can see if you already have a version on your machine.
+
+The Twilio SendGrid Python helper library supports Python 2.7, 3.5, 3.6, 3.7, and 3.8.
+
+Python version check
+Check your Python version by opening your terminal (also known as a command line or console) and typing the following command.
+
+python --version
+If you have Python installed, the terminal should print something like the following output.
+
+Python 3.8.5
+Though the SendGrid helper library supports Python back to version 2.7, we recommend using a 3.x version now that Python 2 has reached end-of-life status.
+
+It is possible to have multiple versions of Python on your computer. Some operating systems come with a version of Python already installed. If you run python --version and receive Python 2.7.x after installing Python 3, try running python3 --version to see which 3.x version of Python you have installed. This tutorial will use the python command, assuming you are working with Python 3. If you have not set up Python 3 in a virtual environment, you may need to run the command python3 instead.
+
+For more about running multiple versions of Python, see "Virtual Environments and Packages" in the Python documentation.
+
+Install Python
+If you do not already have a version of Python installed, visit the Python website to download and install a version appropriate for your operating system.
+
+Starting the project
+Using a Twilio SendGrid helper library is the fastest way to deliver your first email.
+
+Start by creating a project folder for this app. You can name the project anything you like. We use sg_quickstart in the following examples.
+
+mkdir sg_quickstart
+Next, navigate into the sg_quickstart directory where you will complete the rest of the tutorial.
+
+cd sg_quickstart
+Initialize your project
+The pip package manager was included when you installed Python. You can use pip to install the Twilio SendGrid helper library and save it as a project dependency. If you want to verify that pip is installed, you can type the following into the terminal.
+
+pip --version
+The terminal should print something like the following output.
+
+pip 20.1.1 from /usr/locallib/python3.8/site-packages/pip (python 3.8)
+If you do not have a version of pip installed, you can download and install it using the pip installation instructions on python.org.
+
+Install the helper library
+To install the Twilio SendGrid helper library, type the following command into the terminal.
+
+pip install sendgrid
+The terminal should print something like.
+
+Collecting sendgrid
+  Using cached sendgrid-6.4.6-py3-none-any.whl (73 kB)
+Requirement already satisfied: python-http-client>=3.2.1 in /usr/local/lib/python3.8/site-packages (from sendgrid) (3.3.1)
+Requirement already satisfied: starkbank-ecdsa>=1.0.0 in /usr/local/lib/python3.8/site-packages (from sendgrid) (1.0.0)
+Installing collected packages: sendgrid
+Successfully installed sendgrid-6.4.6
+How to send an API email
+You're now ready to write some code. First, create a file in your project directory. You can use app.py.
+
+Complete code block
+The following Python block contains all the code needed to successfully deliver a message with the SendGrid Mail Send API. You can copy this code, modify the from_email and to_email variables, and run the code if you like. We'll break down each piece of this code in the following sections.
+
+import sendgrid
+import os
+from sendgrid.helpers.mail import Mail, Email, To, Content
+
+sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+from_email = Email("test@example.com")  # Change to your verified sender
+to_email = To("test@example.com")  # Change to your recipient
+subject = "Sending with SendGrid is Fun"
+content = Content("text/plain", "and easy to do anywhere, even with Python")
+mail = Mail(from_email, to_email, subject, content)
+
+# Get a JSON-ready representation of the Mail object
+mail_json = mail.get()
+
+# Send an HTTP POST request to /mail/send
+response = sg.client.mail.send.post(request_body=mail_json)
+print(response.status_code)
+print(response.headers)
